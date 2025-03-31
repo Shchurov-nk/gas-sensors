@@ -1,0 +1,10 @@
+corr/*
+interim/*
+
+Linear_long_1_conv/*
+Linear_long_2_conv/*
+Linear_long_3_conv/*
+
+processed/*
+
+!.gitignore
