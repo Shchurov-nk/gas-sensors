@@ -62,14 +62,14 @@ for subset_name, df in dataframes.items():
         X_sensor.to_feather(interim_data_path / f'{sensor_name}-{subset_name}.feather')
 
         if subset_name == 'trn':
-            corr_XX = X_sensor.corr()
+            corr_XX = X_sensor.corr().abs()
             corr_XX.to_feather(
                 corr_xx_path / f'corr_XX-{sensor_name}.feather'
                 )
             
             corr_XY = pd.DataFrame()
             for y_col in y.columns:
-                corr_XY[y_col] = X_sensor.corrwith(y[y_col])
+                corr_XY[y_col] = X_sensor.corrwith(y[y_col]).abs()
             corr_XY.to_feather(
                 corr_xy_path / f'corr_XY-{sensor_name}.feather'
                 )
