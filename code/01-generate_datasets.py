@@ -51,7 +51,7 @@ for subset_name, df in dataframes.items():
 
     X = df.drop(columns=targets)
     y = df[targets]
-
+    y.to_feather(interim_data_path / f'{subset_name}_targets.feather')
     sensors_one_by_one = []
     X_cols = X.columns.tolist()
     prefixes = [i.split('_')[0]+'_' for i in X_cols[::num_timesteps_sensor]]
