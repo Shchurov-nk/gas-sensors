@@ -13,8 +13,8 @@ from config import interim_data_path, masks_path, data_path, sensors, targets
 
 def fit_my_model(X_trn, y_trn, X_vld, y_vld, params):
     model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.Dense(8, activation='sigmoid'))
-    model.add(tf.keras.layers.Dense(1,  activation='sigmoid'))
+    model.add(tf.keras.layers.Dense(32, activation='sigmoid'))
+    model.add(tf.keras.layers.Dense(1,  activation='linear'))
     
     adam = tf.keras.optimizers.Adam(learning_rate=params['lr'])
     model.compile(optimizer=adam, loss='mean_squared_error')
