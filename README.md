@@ -1,3 +1,8 @@
+Clone this repository
+```bash
+git clone https://github.com/Shchurov-nk/gas-sensors.git
+```
+
 Download miniconda
 
 ```bash
