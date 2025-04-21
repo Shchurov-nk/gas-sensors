@@ -1,30 +1,8 @@
 from tqdm import tqdm
 import pandas as pd
-from config import raw_data_path, interim_data_path, processed_data_path, corr_xx_path, corr_xy_path
+from config import raw_data_path, interim_data_path, processed_data_path, corr_xx_path, corr_xy_path, targets, cols_to_drop
 
 num_timesteps_sensor = 1201 # Num of timesteps (columns) for each sensor
-cols_to_drop = [
-    'Source_file', 
-    'Cycle', 
-    'Time_0', 
-    'purge', 
-    'air', 
-    'NO', 'CH4', 'H2S', 'SO2', 'HCOH', 'CO', 'H2', 'NO2', 'NH3', 
-    'After_conc_change_No', 
-    'Conc_plateau_No', 
-    'Subset'
-    ]
-targets = [
-    'NO_conc', 
-    'CH4_conc', 
-    'H2S_conc', 
-    'SO2_conc', 
-    'HCOH_conc', 
-    'CO_conc', 
-    'H2_conc', 
-    'NO2_conc', 
-    'NH3_conc'
-    ]
 
 raw_trn = raw_data_path / 'Linear_long_1_merged_cnt_trn.csv'
 raw_vld = raw_data_path / 'Linear_long_1_merged_cnt_vld.csv'

@@ -11,6 +11,7 @@ corr_xx_path = data_path / 'corr' / 'XX'
 corr_xy_path = data_path / 'corr' / 'XY'
 masks_path = data_path / 'masks'
 
+# Targets to predict with ML model
 targets = [
     'NO_conc',
     'CH4_conc',
@@ -23,4 +24,19 @@ targets = [
     'NH3_conc'
     ]
 
+# Drop columns from raw dataset. 
+# Add unused targets here (otherwise they will be added to train dataset)
+cols_to_drop = [
+    'Source_file', 
+    'Cycle', 
+    'Time_0', 
+    'purge', 
+    'air', 
+    'NO', 'CH4', 'H2S', 'SO2', 'HCOH', 'CO', 'H2', 'NO2', 'NH3', 
+    'After_conc_change_No', 
+    'Conc_plateau_No', 
+    'Subset'
+    ]
+
+# Sensor names in raw dataset
 sensors = [f'R{i}' for i in range(1,13)]
