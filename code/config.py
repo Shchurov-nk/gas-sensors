@@ -40,3 +40,12 @@ cols_to_drop = [
 
 # Sensor names in raw dataset
 sensors = [f'R{i}' for i in range(1,13)]
+
+# Parameters of ML model
+params = {
+    'min_delta' : 0.0005,
+    'patience' : 30,
+    'epochs' : 300,
+    'lr' : 0.001,
+    'batch_size' : 32
+}

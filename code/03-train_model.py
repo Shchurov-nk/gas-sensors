@@ -9,7 +9,10 @@ from sklearn.metrics import mean_absolute_error, r2_score
 import tensorflow as tf
 # from keras.models import load_model
 import joblib
-from config import interim_data_path, masks_path, data_path, sensors, targets
+from config import interim_data_path, masks_path, data_path, sensors, targets, params
+
+tf.config.threading.set_intra_op_parallelism_threads(8)  
+tf.config.threading.set_inter_op_parallelism_threads(8)
 
 def fit_my_model(X_trn, y_trn, X_vld, y_vld, params):
     model = tf.keras.models.Sequential()
@@ -30,7 +33,7 @@ def fit_my_model(X_trn, y_trn, X_vld, y_vld, params):
     )
 
     model.fit(X_trn, y_trn, 
-              batch_size=4,
+              batch_size=params['batch_size'],
               epochs=params['epochs'],
               verbose=0,
               callbacks=callback,
@@ -38,12 +41,6 @@ def fit_my_model(X_trn, y_trn, X_vld, y_vld, params):
              )
     return model
 
-params = {
-    'min_delta' : 0.0005,
-    'patience' : 30,
-    'epochs' : 300,
-    'lr' : 0.001
-}
 
 y_trn = pd.read_feather(interim_data_path / 'trn_targets.feather') / 100
 y_vld = pd.read_feather(interim_data_path / 'vld_targets.feather') / 100
