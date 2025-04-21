@@ -1,0 +1,98 @@
+import time
+start_time = time.time()
+
+from tqdm import tqdm
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_absolute_error, r2_score
+import tensorflow as tf
+# from keras.models import load_model
+import joblib
+from config import interim_data_path, masks_path, data_path, sensors, targets
+
+def fit_my_model(X_trn, y_trn, X_vld, y_vld, params):
+    model = tf.keras.models.Sequential()
+    model.add(tf.keras.layers.Dense(8, activation='sigmoid'))
+    model.add(tf.keras.layers.Dense(1,  activation='sigmoid'))
+    
+    adam = tf.keras.optimizers.Adam(learning_rate=params['lr'])
+    model.compile(optimizer=adam, loss='mean_squared_error')
+
+    callback = tf.keras.callbacks.EarlyStopping(
+        monitor='val_loss',
+        min_delta=params['min_delta'],
+        patience=params['patience'],
+        verbose=0,
+        mode='min',
+        baseline=None,
+        restore_best_weights=True,
+    )
+
+    model.fit(X_trn, y_trn, 
+              batch_size=4,
+              epochs=params['epochs'],
+              verbose=0,
+              callbacks=callback,
+              validation_data=(X_vld, y_vld),
+             )
+    return model
+
+params = {
+    'min_delta' : 0.0005,
+    'patience' : 30,
+    'epochs' : 300,
+    'lr' : 0.001
+}
+
+y_trn = pd.read_feather(interim_data_path / 'trn_targets.feather') / 100
+y_vld = pd.read_feather(interim_data_path / 'vld_targets.feather') / 100
+
+result = []
+progr_bar_sensors = tqdm(sensors)
+for sensor in progr_bar_sensors:
+    progr_bar_sensors.set_postfix_str(f'sensor : {sensor}')
+
+    X_trn = pd.read_feather(interim_data_path / f'{sensor}-trn.feather')
+    X_vld = pd.read_feather(interim_data_path / f'{sensor}-vld.feather')
+
+    scalers_path = data_path / 'scalers' / f'{sensor}_scaler.joblib'
+    scaler = MinMaxScaler()
+    X_trn = pd.DataFrame(scaler.fit_transform(X_trn), columns=X_trn.columns)
+    X_vld = pd.DataFrame(scaler.transform(X_vld), columns=X_vld.columns)
+    joblib.dump(scaler, scalers_path)
+
+    masks_df = pd.read_feather(masks_path / f'{sensor}.feather')
+
+    progr_bar_targets = tqdm(targets, leave=False)
+    for target in progr_bar_targets:
+        progr_bar_targets.set_postfix_str(f'target : {target}')
+        for to_mask in tqdm([True, False], postfix='mask on/off', leave=False):
+            if to_mask == True:
+                selected_columns = masks_df.index[masks_df[target]]
+            elif to_mask == False:
+                selected_columns = masks_df.index
+            
+            model = fit_my_model(
+                X_trn[selected_columns], 
+                y_trn[target], 
+                X_vld[selected_columns], 
+                y_vld[target], 
+                params
+                )
+
+            model_name = data_path / 'models' / 'NN' / f'NN_{sensor}_{target}_{to_mask}.h5'
+            model.save(model_name)
+
+            y_pred = model.predict(X_vld[selected_columns], verbose=0)
+
+            mae = mean_absolute_error(y_vld[target], y_pred)
+            r2 = r2_score(y_vld[target], y_pred)
+            result.append([sensor, target, to_mask, mae, r2])
+
+final_result = pd.DataFrame(result, columns=['sensor', 'target', 'mask', 'mae', 'r2'])
+
+final_result.to_excel('final_result.xlsx')
+
+with open('time.txt', 'w') as file_time:
+    file_time.write(f"total time: {time.time() - start_time} seconds")
