@@ -8,7 +8,7 @@ raw_trn = raw_data_path / 'Linear_long_1_merged_cnt_trn.csv'
 raw_vld = raw_data_path / 'Linear_long_1_merged_cnt_vld.csv'
 raw_tst = raw_data_path / 'Linear_long_1_merged_cnt_tst.csv'
 
-# Create directories if not exists
+# Create directories if they don't already exist
 interim_data_path.mkdir(parents=True, exist_ok=True)
 processed_data_path.mkdir(parents=True, exist_ok=True)
 corr_xx_path.mkdir(parents=True, exist_ok=True)

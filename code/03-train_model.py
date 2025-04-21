@@ -45,6 +45,9 @@ def fit_my_model(X_trn, y_trn, X_vld, y_vld, params):
 y_trn = pd.read_feather(interim_data_path / 'trn_targets.feather') / 100
 y_vld = pd.read_feather(interim_data_path / 'vld_targets.feather') / 100
 
+nn_models_path = data_path / 'models' / 'NN'
+nn_models_path.mkdir(parents=True, exist_ok=True)
+
 result = []
 progr_bar_sensors = tqdm(sensors)
 for sensor in progr_bar_sensors:
@@ -78,7 +81,7 @@ for sensor in progr_bar_sensors:
                 params
                 )
 
-            model_name = data_path / 'models' / 'NN' / f'NN_{sensor}_{target}_{to_mask}.h5'
+            model_name = nn_models_path / f'NN_{sensor}_{target}_{to_mask}.h5'
             model.save(model_name)
 
             y_pred = model.predict(X_vld[selected_columns], verbose=0)
