@@ -11,8 +11,8 @@ import tensorflow as tf
 import joblib
 from config import interim_data_path, masks_path, data_path, sensors, targets, params
 
-tf.config.threading.set_intra_op_parallelism_threads(8)  
-tf.config.threading.set_inter_op_parallelism_threads(8)
+# tf.config.threading.set_intra_op_parallelism_threads(8)  
+# tf.config.threading.set_inter_op_parallelism_threads(8)
 
 def fit_my_model(X_trn, y_trn, X_vld, y_vld, params):
     model = tf.keras.models.Sequential()

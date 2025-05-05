@@ -41,6 +41,10 @@ cols_to_drop = [
 # Sensor names in raw dataset
 sensors = [f'R{i}' for i in range(1,13)]
 
+# Levels of IFS algorithm (mask generation)
+level_xx = 0.9999
+level_xy = 0.0
+
 # Parameters of ML model
 params = {
     'min_delta' : 0.0005,
