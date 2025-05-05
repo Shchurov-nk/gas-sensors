@@ -1,6 +1,9 @@
 import time
 start_time = time.time()
 
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' # To supress "This TensorFlow binary is optimized..." message
+
 from tqdm import tqdm
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
@@ -11,7 +14,13 @@ import tensorflow as tf
 import joblib
 from config import interim_data_path, masks_path, data_path, sensors, targets, params
 
-# tf.config.threading.set_intra_op_parallelism_threads(8)  
+# My CPU is i5 12400 (6 physical, 12 logical cores)
+# Use 6 threads for intra-op parallelism (1 per physical core)
+tf.config.threading.set_intra_op_parallelism_threads(6)
+# Use 2 threads for inter-op parallelism (to leverage Hyper-Threading)
+tf.config.threading.set_inter_op_parallelism_threads(2)
+
+# tf.config.threading.set_intra_op_parallelism_threads(8)
 # tf.config.threading.set_inter_op_parallelism_threads(8)
 
 def fit_my_model(X_trn, y_trn, X_vld, y_vld, params):
@@ -81,7 +90,7 @@ for sensor in progr_bar_sensors:
                 params
                 )
 
-            model_name = nn_models_path / f'NN_{sensor}_{target}_{to_mask}.h5'
+            model_name = nn_models_path / f'NN_{sensor}_{target}_{to_mask}.keras'
             model.save(model_name)
 
             y_pred = model.predict(X_vld[selected_columns], verbose=0)
