@@ -47,9 +47,9 @@ level_xy = 0.0
 
 # Parameters of ML model
 params = {
-    'min_delta' : 0.0005,
-    'patience' : 30,
-    'epochs' : 300,
+    'min_delta' : 0.000,
+    'patience' : 100,
+    'epochs' : 3000,
     'lr' : 0.001,
     'batch_size' : 32
 }
