@@ -40,6 +40,8 @@ cols_to_drop = [
 
 # Sensor names in raw dataset
 sensors = [f'R{i}' for i in range(1,13)]
+to_mask_list = [True, False]
+verbose = True
 
 # Levels of IFS algorithm (mask generation)
 level_xx = 0.9999
