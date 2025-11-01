@@ -12,16 +12,7 @@ from sklearn.metrics import mean_absolute_error, r2_score
 import tensorflow as tf
 # from keras.models import load_model
 import joblib
-from config import interim_data_path, masks_path, data_path, sensors, targets, params
-
-# My CPU is i5 12400 (6 physical, 12 logical cores)
-# Use 6 threads for intra-op parallelism (1 per physical core)
-tf.config.threading.set_intra_op_parallelism_threads(6)
-# Use 2 threads for inter-op parallelism (to leverage Hyper-Threading)
-tf.config.threading.set_inter_op_parallelism_threads(2)
-
-# tf.config.threading.set_intra_op_parallelism_threads(8)
-# tf.config.threading.set_inter_op_parallelism_threads(8)
+from config import interim_data_path, masks_path, data_path, sensors, targets, to_mask_list, params, verbose
 
 def fit_my_model(X_trn, y_trn, X_vld, y_vld, params):
     model = tf.keras.models.Sequential()
@@ -50,6 +41,10 @@ def fit_my_model(X_trn, y_trn, X_vld, y_vld, params):
              )
     return model
 
+def display_progress(s_i,sensors,t_i,targets,m_i):
+    print(f'{s_i}/{len(sensors)} : {sensor}')
+    print(f'{t_i}/{len(targets)} : {target}')
+    print(f'{m_i}/{len(to_mask_list)} : {to_mask}')
 
 y_trn = pd.read_feather(interim_data_path / 'trn_targets.feather') / 100
 y_vld = pd.read_feather(interim_data_path / 'vld_targets.feather') / 100
@@ -58,10 +53,7 @@ nn_models_path = data_path / 'models' / 'NN'
 nn_models_path.mkdir(parents=True, exist_ok=True)
 
 result = []
-progr_bar_sensors = tqdm(sensors)
-for sensor in progr_bar_sensors:
-    progr_bar_sensors.set_postfix_str(f'sensor : {sensor}')
-
+for s_i, sensor in enumerate(sensors):
     X_trn = pd.read_feather(interim_data_path / f'{sensor}-trn.feather')
     X_vld = pd.read_feather(interim_data_path / f'{sensor}-vld.feather')
 
@@ -73,10 +65,11 @@ for sensor in progr_bar_sensors:
 
     masks_df = pd.read_feather(masks_path / f'{sensor}.feather')
 
-    progr_bar_targets = tqdm(targets, leave=False)
-    for target in progr_bar_targets:
-        progr_bar_targets.set_postfix_str(f'target : {target}')
-        for to_mask in tqdm([True, False], postfix='mask on/off', leave=False):
+    for t_i, target in enumerate(targets):
+        for m_i, to_mask in enumerate(to_mask_list):
+            if verbose:
+                display_progress()
+
             if to_mask == True:
                 selected_columns = masks_df.index[masks_df[target]]
             elif to_mask == False:
