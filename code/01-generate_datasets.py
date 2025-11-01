@@ -1,4 +1,3 @@
-from tqdm import tqdm
 import pandas as pd
 from config import raw_data_path, interim_data_path, processed_data_path, corr_xx_path, corr_xy_path, targets, cols_to_drop
 
@@ -24,7 +23,7 @@ dataframes = {
     'tst': df_tst
 }
 
-for subset_name, df in tqdm(dataframes.items()):
+for subset_name, df in dataframes.items():
     df.drop(columns=cols_to_drop, inplace=True)
     df.to_feather(interim_data_path / f'{subset_name}.feather')
 
@@ -34,7 +33,7 @@ for subset_name, df in tqdm(dataframes.items()):
     sensors_one_by_one = []
     X_cols = X.columns.tolist()
     prefixes = [i.split('_')[0]+'_' for i in X_cols[::num_timesteps_sensor]]
-    for prefix in tqdm(prefixes, leave=False):
+    for prefix in prefixes:
         one_sensor_cols = [i for i in X_cols if i.startswith(prefix)]
         sensor_name = prefix[:-1]
         X_sensor = X[one_sensor_cols]
